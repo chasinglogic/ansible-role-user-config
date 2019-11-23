@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Mathew Robinson
+  role_name: user_config
+  description: Deploy user configuration files into their home directories
+  license: Apache
+  min_ansible_version: 2.7
+  platforms:
+    - name: debian
+    - name: ubuntu
+    - name: rhel
+    - name: fedora
+    - name: opensuse
+    - name: ArchLinux
+  galaxy_tags:
+    - users
+    - user_management
+    - user_config
