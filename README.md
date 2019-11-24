@@ -1,38 +1,60 @@
-Ansible role for updates
+Ansible role for user_config
 ==================================
 
-Optionally run blanket package updates on your Linux systems
-
-[![CircleCI](https://img.shields.io/circleci/build/github/chasinglogic/ansible-role-updates/master?style=flat-square)](https://circleci.com/gh/chasinglogic/ansible-role-updates)
-
+Deploy user configuration files into their home directories
 
 Example Playbook
 ----------------
 
-All that's required to enable this role is to add it to the role list
-for your hosts. All is generally a good choice since it works on
-(almost) all Linux distributions.
+Add this role to your role lists for the hosts 
 
 ```yaml
 - hosts: all
   roles:
-    - role: updates
+    - role: chasinglogic.user_config
 ```
 
-You can then disable updates for any `ansible-playbook` run by adding
-the flag `--skip-tags updates`. All tasks in this role use this tag so
-conversely, you can only run updates (i.e. no other tasks) but using
-`--tags updates`. Without one of the aforementioned flags updates will
-always run on your systems.
+This role is compatible, but does not depend on,
+[singleplatform-eng.users](https://galaxy.ansible.com/singleplatform-eng/users). It
+reads the same users variable and accepts the same structure as that
+playbook. Documented here is the minimum required structure for this role to function:
 
-Development
------------
+```yaml
+users:
+    # Required: Must have a username defined
+  - username: chasinglogic
+    # Optional: Defaults to /home/{{ username }}
+    home: /home/chasinglogic
+```
 
-Testing this role locally requires the Molecule.
+Once the role is added and the users variable is configured this role
+will look in the files directory for a directory that matches `{{
+username }}/home`. For the above variable definition if we created at
+the root of our playbook repository the directories:
 
-After installing the CLI, invoke the following command to run the Molecule tests:
+```text
+playbook.yml
+files
+└── chasinglogic
+    └── home
+        ├── .bash_profile
+        ├── .bashrc
+        ├── .ctags
+        ├── .emacs.d
+        │   └── init.el
+        ├── .gitconfig
+        ├── .gitignore
+        ├── .mbsyncrc
+        ├── .profile
+        ├── .projector.yml
+        ├── .project.yml
+        ├── .tmux.conf
+        └── .zshrc
+```
 
-    $ make test
+Then all of the files, directories, and symlinks shown will be created
+in the chasinglogic user's home directory. This is recursive and can
+be nested as deep as your file system allows.
 
 License
 -------
