@@ -1,0 +1,60 @@
+---
+- set_fact:
+    user_home_dir: "{{ user.home_dir | default('/home/' + user.username) }}"
+
+- name: Create configuration directories
+  tags: 
+    - config
+  file:
+    owner: "{{ user.username }}"
+    path: "{{ user_home_dir }}/{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+  with_filetree: "{{ user.username }}/home"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == "directory"
+
+- name: Deploy configuration files
+  tags: 
+    - config
+  copy:
+    owner: "{{ user.username }}"
+    src: "{{ item.src }}"
+    dest: "{{ user_home_dir }}/{{ item.path }}"
+    mode: "{{ item.mode }}"
+  with_filetree: "{{ user.username }}/home"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == "file" and not item.path.endswith('.j2')
+
+
+- name: Template configuration files
+  tags: 
+    - config
+  template:
+    owner: "{{ user.username }}"
+    src: "{{ item.src }}"
+    dest: "{{ user_home_dir }}/{{ item.path }}"
+    mode: "{{ item.mode }}"
+  with_filetree: "{{ user.username }}/home"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == "file" and item.path.endswith('.j2')
+
+- name: Recreate configuration symlinks
+  tags: 
+    - config
+  file:
+    owner: "{{ user.username }}"
+    src: "{{ item.src }}"
+    dest: "{{ user_home_dir }}/{{ item.path }}"
+    state: link
+    force: yes
+    mode: "{{ item.mode }}"
+  with_filetree: "{{ user.username }}/home"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == "link"
+
+-

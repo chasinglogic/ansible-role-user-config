@@ -1,0 +1,9 @@
+---
+- name: Deploy user configuration
+  tags: 
+    - config
+  include_tasks: user_config.yml
+  loop_control:
+    loop_var: user
+    label: "{{ user.username }}"
+  loop: "{{ users }}"
