@@ -35,7 +35,7 @@
   template:
     owner: "{{ user.username }}"
     src: "{{ item.src }}"
-    dest: "{{ user_home_dir }}/{{ item.path }}"
+    dest: "{{ user_home_dir }}/{{ item.path[0:-3] }}"
     mode: "{{ item.mode }}"
   with_filetree: "{{ user.username }}/home"
   loop_control:
